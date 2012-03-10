@@ -1,0 +1,92 @@
+============================================================
+Ex.
+
+Induction on derivation.
+
+If, for each derivation t1 -> t2,
+given P(t0 -> t1) for all possible rules used as a root in t0 -> t1
+we can show P(t1 -> t2),
+then P(t1 -> t2) holds for all possible derivations.
+
+
+As in:
+
+If, for each term s,
+given P (r) for all r such that depth(r) < depth(s)
+we can show P (s),
+then P (s) holds for all s.
+
+
+============================================================
+Ex 3.5.13
+
+
+if true then t2 else t3 -> t2  (E-IfTrue)
+
+if false then t2 else t3 -> t3  (E-IfFalse)
+
+t1 -> t1'
+--------
+if t1 then t2 else t3 -> if t1' then t2 else t3  (E-If)
+
+if true then t2 else t3 -> t3 (E-Funny1)
+
+
+- check 3.5.4
+
+Determinacy
+If t -> t' and t -> t'' then t' = t''
+
+Proof by induction on derivation t -> t'.
+
+Assume t -> t' last rule is E-IfTrue. Then t has this form
+
+if t1 then t2 else t3
+
+with t1 = true.
+
+Then it's not possible to use E-IfFalse and E-If for t''.
+But it's possible to use E-Funny and get t3 instead of t2.
+
+3.5.4 does not hold.
+
+
+
+- check 3.5.7
+
+"Every value is in normal form" (normal form = no rules to apply)
+
+Holds, since we do not add any rules like "true -> ..." or "false -> ..."
+
+
+
+- check 3.5.8
+"Every normal form is a value"
+
+holds.
+
+- check 3.5.11
+
+does not hold since 3.5.4 does not hold.
+
+- check 3.5.12
+
+size still decreases, so finally it reaches normal form (=terminates)
+
+
+
+b)
+
+t2 -> t2'
+---------
+if t1 then t2 else t3 -> if t1 then t2' else t3   (E-Funny2)
+
+- check 3.5.4
+
+Determinacy
+If t -> t' and t -> t'' then t' = t''
+
+
+if t1 then t2 else t3
+t1 = true
+
