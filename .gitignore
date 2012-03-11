@@ -1,2 +1,5 @@
 misc/
 *.txt
+*.o
+*.hi
+Interpreter
