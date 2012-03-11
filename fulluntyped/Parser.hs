@@ -7,19 +7,7 @@ import Text.Parsec
 import Text.Parsec.String (Parser)
 
 import Lexer
-
-type Name = String
-
--- Expr here is parametrized.
--- 1) "a = String" for named terms
--- 2) "a = Int" for nameless, de Bruijn-style terms.
-data Expr a =
-  Var a
-  | Abs String (Expr a)
-  | App (Expr a) (Expr a)
-  deriving Show
-
-type Term = Expr Name
+import Types
 
 variable :: Parser Term
 variable = Var <$> identifier
