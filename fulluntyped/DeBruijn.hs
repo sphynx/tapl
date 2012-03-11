@@ -3,6 +3,8 @@ Convert terms to nameless de Bruijn representation when we used indices
 instead of variables names.
 -}
 
+{-# OPTIONS_GHC -Wall #-}
+
 module DeBruijn (
   removeNames,
   restoreNames,
@@ -11,7 +13,6 @@ module DeBruijn (
   substituteTop
   ) where
 
-import Parser
 import Data.List
 import Data.Char
 
@@ -46,16 +47,16 @@ restoreNamesM t =
     Var idx -> Var <$> asks (!! idx) -- FIXME: use safe (!!) here
     App t1 t2 -> App <$> restoreNamesM t1 <*> restoreNamesM t2
     Abs n t1 -> do
-      name <- asks (nextName n)
-      t <- local (name:) (restoreNamesM t1)
-      return $ Abs name t
+      name <- asks $ nextName n
+      subt <- local (name:) (restoreNamesM t1)
+      return $ Abs name subt
 
 --
 -- shifts indices by amount d, incrementing free variables indices and
 -- keeping bound variables (less than "cutoff" parameter) the same.
 --
 shift :: Int -> NamelessTerm -> NamelessTerm
-shift d t = go 0 t where
+shift d term = go 0 term where
   go cutoff t = case t of
     Var k -> Var $ if k < cutoff then k else k + d
     Abs n t1 -> Abs n $ go (cutoff+1) t1
@@ -67,16 +68,17 @@ shift d t = go 0 t where
 substitute :: Int -> NamelessTerm -> NamelessTerm -> NamelessTerm
 substitute j s t = case t of
   Var k -> if j == k then s else Var k
-  Abs n t1 -> Abs n $ substitute (j+1) (shift 1 s) t
+  Abs n t1 -> Abs n (substitute (j + 1) (shift 1 s) t1)
   App t1 t2 -> App (substitute j s t1) (substitute j s t2)
 
 --
--- beta-reduction substitution (\.t1) t2
+-- beta-reduction substitution (\.t1) v2
+-- i.e. [0 |-> v2] t1   and some additionals shifts
 --
 -- 0 in t1 is substituted with shifted t2 term and then the resulting
 -- term is "unshifted", since the variable is "used-up", it disappears
 substituteTop :: NamelessTerm -> NamelessTerm -> NamelessTerm
-substituteTop t1 t2 = shift (-1) $ substitute 0 (shift 1 t2) t1
+substituteTop v2 t1 = shift (-1) $ substitute 0 (shift 1 v2) t1
 
 --
 -- generates a new name (by adding a non-clasing numerical suffix) if
@@ -106,8 +108,4 @@ canonical name =
   in case parseInt no of
     Nothing -> (name, 0)
     Just x  -> (base, x)
-
--- default context from TAPL
-defCtx :: NamingCtx
-defCtx = ["b","a","z","y","x"]
 

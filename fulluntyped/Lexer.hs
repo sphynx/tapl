@@ -9,6 +9,7 @@ lexer :: Tok.TokenParser ()
 lexer = Tok.makeTokenParser $ Lang.emptyDef
   { -- for lambda abstractions
     Tok.reservedOpNames = ["\\", "."]
+  , Tok.reservedNames = ["true", "false", "test"]
     -- to allow "\x.\y" without ".\" treated as a new operator
   , Tok.opLetter = oneOf "."
   }
@@ -16,6 +17,12 @@ lexer = Tok.makeTokenParser $ Lang.emptyDef
 -- here, we re-export a couple of useful token-based parsers
 parens :: Parser a -> Parser a
 parens = Tok.parens lexer
+
+natural :: Parser Integer
+natural = Tok.natural lexer
+
+reserved :: String -> Parser ()
+reserved = Tok.reserved lexer
 
 reservedOp :: String -> Parser ()
 reservedOp = Tok.reservedOp lexer

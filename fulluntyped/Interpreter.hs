@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wall #-}
+
 module Interpreter where
 
 import Types
@@ -21,8 +23,8 @@ evalRepl = forever (getLine >>= putStrLn . run)
 -- Nothing means "no rules can be applied".
 eval1 :: NamelessTerm -> Maybe NamelessTerm
 eval1 t = case t of
-  App (Abs v t1) v2
-    | isValue v2 -> pure $ substituteTop t1 v2
+  App (Abs _ t1) v2
+    | isValue v2 -> pure $ substituteTop v2 t1
   App v1 t2
     | isValue v1 -> App <$> pure v1 <*> eval1 t2
   App t1 t2 ->
@@ -37,7 +39,6 @@ eval t =
     Nothing -> t
     Just t' -> eval t'
 
---
 run :: String -> String
 run s =
   let namedTerm = parseExpr s
@@ -45,7 +46,18 @@ run s =
       namelessTerm = removeNames ctx namedTerm
   in pretty . restoreNames ctx . eval $ namelessTerm
 
+
+-- test true x y -> x
+term1 :: Term
+term1 = parseExpr "test true"
+
+nTerm1 :: NamelessTerm
+nTerm1 = removeNames [] term1
+
 -- whether term is a value
 isValue :: Expr a -> Bool
 isValue (Abs {}) = True
 isValue _ = False
+
+main :: IO ()
+main = evalRepl
