@@ -32,6 +32,15 @@ eval1 t = case t of
   _ ->
     Nothing
 
+evalBig :: NamelessTerm -> NamelessTerm
+evalBig t = case t of
+  lam@(Abs {}) -> lam
+  App t1 t2 ->
+    let v2 = evalBig t2
+        Abs _ t12 = evalBig t1
+    in evalBig (substituteTop v2 t12)
+  t' -> t'
+
 -- applies one-step evaluation until no more rules can be applied
 eval :: NamelessTerm -> NamelessTerm
 eval t =
