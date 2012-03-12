@@ -9,3 +9,6 @@ compile:	clean
 
 test:	compile
 	./Interpreter
+
+hlint:
+	hlint .
