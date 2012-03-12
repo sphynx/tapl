@@ -46,7 +46,7 @@ pretty = render . go maxDepth where
       go' t1 <+> go' t2
 
     where
-      go' term = go (d-1) term
+      go' = go (d-1)
 
 -- helper stuff
 

@@ -56,7 +56,7 @@ restoreNamesM t =
 -- keeping bound variables (less than "cutoff" parameter) the same.
 --
 shift :: Int -> NamelessTerm -> NamelessTerm
-shift d term = go 0 term where
+shift d = go 0 where
   go cutoff t = case t of
     Var k -> Var $ if k < cutoff then k else k + d
     Abs n t1 -> Abs n $ go (cutoff+1) t1
