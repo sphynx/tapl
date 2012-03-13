@@ -8,9 +8,6 @@ account three facts:
 2. Lambda abstraction body stretches to the right as far as
 possible: \x.y z k = \x.(y z k)
 
-3. Application binds tighter than abstraction. I.e. we need parens
-in the second expression here: (\x.x x) (\x.x x)
-
 -}
 
 module Pretty
@@ -19,9 +16,6 @@ module Pretty
 
 import Text.PrettyPrint
 import Types
-
- -- for more convenient testcases
-import Parser
 
 -- pretty printing depth, a nice idea by Jón Fairbairn mentioned in
 -- Oleg's interpreter, so we can print even divergent terms.
@@ -40,10 +34,17 @@ pretty = render . go maxDepth where
       go' t1 <+> parens (go' t2)
     App t1@(Abs {}) t2@(Abs {}) ->
       parens (go' t1) <+> parens (go' t2)
+    App t1@(Var {}) t2@(Abs {}) ->
+      go' t1 <+> parens (go' t2)
+    App t1@(App {}) t2@(Abs {}) ->
+      go' t1 <+> parens (go' t2)
     App t1@(Abs {}) t2 ->
       parens (go' t1) <+> go' t2
     App t1 t2 ->
       go' t1 <+> go' t2
+    _ ->
+      -- this is here to please "-Wall"
+      error "should not happen, since it is handled earlier"
 
     where
       go' = go (d-1)
@@ -58,5 +59,3 @@ dot = char '.'
 
 ellipsis :: Doc
 ellipsis = space <> text "..." <> space
-
-

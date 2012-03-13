@@ -3,7 +3,6 @@ module Parser
        )  where
 
 import Control.Applicative hiding ((<|>))
-import Control.Monad
 
 import Text.Parsec
 import Text.Parsec.String (Parser)
@@ -65,5 +64,3 @@ parseExpr t =
   case parse (allOf expr) "" t of
     Left err -> error $ show err
     Right ast -> ast
-
-

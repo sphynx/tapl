@@ -6,7 +6,7 @@ clean:
 	rm -f Tests
 
 compile:
-	ghc Interpreter.hs -main-is Interpreter.main
+	ghc -Wall Interpreter.hs -main-is Interpreter.main
 
 run:	compile
 	./Interpreter

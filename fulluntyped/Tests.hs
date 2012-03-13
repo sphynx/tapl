@@ -41,6 +41,8 @@ prettyTests = map (uncurry mkTestCase)
   , identical "\\x.x (y z) t"
   , identical "(\\x.x) y"
   , identical "(\\x.x y) z"
+  , identical "x (\\y.y)"
+  , identical "x y (\\y.y)"
   , ("(x)", "x")
   , ("(x y)", "x y")
   , ("(((x y)))", "x y")
