@@ -3,3 +3,4 @@ misc/
 *.o
 *.hi
 Interpreter
+Tests

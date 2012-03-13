@@ -60,39 +60,3 @@ ellipsis :: Doc
 ellipsis = space <> text "..." <> space
 
 
--- Test suite.
-
--- returns a list of failures: (actual, expected)
-tests :: [(String, String)]
-tests = map (\(r,a,e) -> (a,e)) .
-        filter (\(r,_,_) -> not r) .
-        map (uncurry check) $
-  [ identical "x"
-  , identical "x y"
-  , identical "x y z"
-  , identical "x (y z) t"
-  , identical "\\x.x"
-  , identical "\\x.\\y.x y"
-  , identical "(\\x.x x) (\\x.x x)"
-  , identical "(\\x.x x) (\\z.z)"
-  , identical "(\\x.x x) t"
-  , identical "\\x.\\y.\\z.x y z"
-  , identical "\\x.x (y z)"
-  , identical "\\x.x (y z) t"
-  , identical "(\\x.x) y"
-  , identical "(\\x.x y) z"
-  , ("(x)", "x")
-  , ("(x y)", "x y")
-  , ("(((x y)))", "x y")
-  , ("(x (y) z)", "x y z")
-  , ("((x y) z)", "x y z")
-  , ("((x y) z) t", "x y z t")
-  , ("(b k) ((x y) z) t", "b k (x y z) t")
-  , ("\\x.(x y z)", "\\x.x y z")
-  , ("\\x.(x y) z", "\\x.x y z")
-  , ("(\\x.x x) (t)", "(\\x.x x) t")
-  ]
-  where
-    identical x = (x, x)
-    check inp exp = let act = pretty (parseExpr inp)
-                    in (exp == act, act, exp)
