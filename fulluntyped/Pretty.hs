@@ -21,7 +21,7 @@ import Text.PrettyPrint
 import Types
 
  -- for more convenient testcases
-import Parser hiding (lambda, test)
+import Parser
 
 -- pretty printing depth, a nice idea by Jón Fairbairn mentioned in
 -- Oleg's interpreter, so we can print even divergent terms.

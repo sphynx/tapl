@@ -1,4 +1,6 @@
-module Parser where
+module Parser
+       ( parseExpr
+       )  where
 
 import Control.Applicative hiding ((<|>))
 import Control.Monad
@@ -61,7 +63,7 @@ expr = foldl1 App <$> many1 atomicExpr
 parseExpr :: String -> Term
 parseExpr t =
   case parse (allOf expr) "" t of
-    Left err -> error (show err)
+    Left err -> error $ show err
     Right ast -> ast
 
 
