@@ -21,3 +21,6 @@ test:	compile
 # intended redundand lambdas there
 hlint:
 	find -name '*.hs' -not -name 'LambdaEncoding.hs' | xargs hlint
+
+tags:
+	find -name '*.hs' | xargs hasktags -e
