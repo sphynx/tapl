@@ -37,16 +37,16 @@ removeNamesM t =
   case t of
     Var name -> do
       idx <- asks $ elemIndex name
-      maybe (error $ "Unknown var: " ++ name) (return . Var) idx
-    App t1 t2 -> App <$> removeNamesM t1 <*> removeNamesM t2
-    Abs name t1 -> Abs name <$> local (name:) (removeNamesM t1)
+      maybe (error $ "Unknown var: " ++ name) (return . NVar) idx
+    App t1 t2 -> NApp <$> removeNamesM t1 <*> removeNamesM t2
+    Abs name t1 -> NAbs name <$> local (name:) (removeNamesM t1)
 
 restoreNamesM :: NamelessTerm -> Env Term
 restoreNamesM t =
   case t of
-    Var idx -> Var <$> asks (!! idx) -- FIXME: use safe (!!) here
-    App t1 t2 -> App <$> restoreNamesM t1 <*> restoreNamesM t2
-    Abs n t1 -> do
+    NVar idx -> Var <$> asks (!! idx) -- FIXME: use safe (!!) here
+    NApp t1 t2 -> App <$> restoreNamesM t1 <*> restoreNamesM t2
+    NAbs n t1 -> do
       name <- asks $ nextName n
       subt <- local (name:) (restoreNamesM t1)
       return $ Abs name subt
@@ -58,18 +58,18 @@ restoreNamesM t =
 shift :: Int -> NamelessTerm -> NamelessTerm
 shift d = go 0 where
   go cutoff t = case t of
-    Var k -> Var $ if k < cutoff then k else k + d
-    Abs n t1 -> Abs n $ go (cutoff+1) t1
-    App t1 t2 -> App (go cutoff t1) (go cutoff t2)
+    NVar k -> NVar $ if k < cutoff then k else k + d
+    NAbs n t1 -> NAbs n $ go (cutoff+1) t1
+    NApp t1 t2 -> NApp (go cutoff t1) (go cutoff t2)
 
 --
 -- performs substitution [j |-> s] t
 --
 substitute :: Int -> NamelessTerm -> NamelessTerm -> NamelessTerm
 substitute j s t = case t of
-  Var k -> if j == k then s else Var k
-  Abs n t1 -> Abs n (substitute (j + 1) (shift 1 s) t1)
-  App t1 t2 -> App (substitute j s t1) (substitute j s t2)
+  NVar k -> if j == k then s else NVar k
+  NAbs n t1 -> NAbs n (substitute (j + 1) (shift 1 s) t1)
+  NApp t1 t2 -> NApp (substitute j s t1) (substitute j s t2)
 
 --
 -- beta-reduction substitution (\.t1) v2

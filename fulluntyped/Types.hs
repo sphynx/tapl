@@ -2,24 +2,21 @@ module Types where
 
 import Data.Set ((\\), singleton, union, Set)
 
-type Name = String
-
--- Expr here is parametrized.
--- 1) "a = String" for named terms
--- 2) "a = Int" for nameless, de Bruijn-style terms.
 data Expr a =
   Var a
-  | Abs String (Expr a)
+  | Abs a (Expr a)
   | App (Expr a) (Expr a)
-  deriving Show
+  deriving (Show, Eq)
 
-instance Functor Expr where
-  fmap f (Var t) = Var (f t)
-  fmap f (Abs name t) = Abs name (fmap f t)
-  fmap f (App t1 t2) = App (fmap f t1) (fmap f t2)
+data NamelessTerm =
+  NVar Int
+   -- we keep names in String here to restore them back later
+  | NAbs String NamelessTerm
+  | NApp NamelessTerm NamelessTerm
+  deriving (Show, Eq)
 
+type Name = String
 type Term = Expr Name
-type NamelessTerm = Expr Int
 
 type NamingCtx = [Name]
 

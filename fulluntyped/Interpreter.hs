@@ -23,21 +23,21 @@ evalRepl = forever (getLine >>= putStrLn . run)
 -- Nothing means "no rules can be applied".
 eval1 :: NamelessTerm -> Maybe NamelessTerm
 eval1 t = case t of
-  App (Abs _ t1) v2
+  NApp (NAbs _ t1) v2
     | isValue v2 -> pure $ substituteTop v2 t1
-  App v1 t2
-    | isValue v1 -> App <$> pure v1 <*> eval1 t2
-  App t1 t2 ->
-    App <$> eval1 t1 <*> pure t2
+  NApp v1 t2
+    | isValue v1 -> NApp <$> pure v1 <*> eval1 t2
+  NApp t1 t2 ->
+    NApp <$> eval1 t1 <*> pure t2
   _ ->
     Nothing
 
 evalBig :: NamelessTerm -> NamelessTerm
 evalBig t = case t of
-  lam@(Abs {}) -> lam
-  App t1 t2 ->
+  lam@(NAbs {}) -> lam
+  NApp t1 t2 ->
     let v2 = evalBig t2
-        Abs _ t12 = evalBig t1
+        NAbs _ t12 = evalBig t1
     in evalBig (substituteTop v2 t12)
   t' -> t'
 
@@ -64,8 +64,8 @@ nTerm1 :: NamelessTerm
 nTerm1 = removeNames [] term1
 
 -- whether term is a value
-isValue :: Expr a -> Bool
-isValue (Abs {}) = True
+isValue :: NamelessTerm -> Bool
+isValue (NAbs {}) = True
 isValue _ = False
 
 main :: IO ()
