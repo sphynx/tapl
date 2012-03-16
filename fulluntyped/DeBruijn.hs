@@ -3,8 +3,6 @@ Convert terms to nameless de Bruijn representation when we used indices
 instead of variables names.
 -}
 
-{-# OPTIONS_GHC -Wall #-}
-
 module DeBruijn (
   removeNames,
   restoreNames,
