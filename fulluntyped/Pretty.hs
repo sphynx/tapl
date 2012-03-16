@@ -30,17 +30,15 @@ pretty = render . go maxDepth where
   go d t          = case t of
     Abs v t1 ->
       lambda <> text v <> dot <> go' t1
-    App t1 t2@(App {}) ->
-      go' t1 <+> parens (go' t2)
-    App t1@(Abs {}) t2@(Abs {}) ->
-      parens (go' t1) <+> parens (go' t2)
-    App t1@(Var {}) t2@(Abs {}) ->
-      go' t1 <+> parens (go' t2)
-    App t1@(App {}) t2@(Abs {}) ->
-      go' t1 <+> parens (go' t2)
-    App t1@(Abs {}) t2 ->
+    App t1@(Abs {}) t2@(Var {}) ->  --- abs var
       parens (go' t1) <+> go' t2
-    App t1 t2 ->
+    App t1@(Abs {}) t2 -> -- abs _
+      parens (go' t1) <+> parens (go' t2)
+    App t1 t2@(App {}) -> -- _ app
+      go' t1 <+> parens (go' t2)
+    App t1 t2@(Abs {}) -> --- var abs
+      go' t1 <+> parens (go' t2)
+    App t1 t2 -> --- _ _
       go' t1 <+> go' t2
     _ ->
       -- this is here to please "-Wall"
