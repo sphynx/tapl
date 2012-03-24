@@ -18,7 +18,20 @@ data NamelessTerm =
 type Name = String
 type Term = Expr Name
 
-type NamingCtx = [Name]
+type NamingCtx = [BoundName]
+
+data BoundName = BoundName
+  { getName    :: Name
+  , getBinding :: Binding
+  } deriving (Eq, Ord, Show)
+
+data Binding =
+  NameBind
+  | VarBind
+  deriving (Eq, Ord, Show)
+
+mkBoundName :: Name -> BoundName
+mkBoundName = flip BoundName NameBind
 
 freeVars :: Term -> Set Name
 freeVars (Var v) = singleton v

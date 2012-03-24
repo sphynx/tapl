@@ -34,19 +34,19 @@ removeNamesM :: Term -> Env NamelessTerm
 removeNamesM t =
   case t of
     Var name -> do
-      idx <- asks $ elemIndex name
+      idx <- asks $ elemIndex (mkBoundName name)
       maybe (error $ "Unknown var: " ++ name) (return . NVar) idx
     App t1 t2 -> NApp <$> removeNamesM t1 <*> removeNamesM t2
-    Abs name t1 -> NAbs name <$> local (name:) (removeNamesM t1)
+    Abs name t1 -> NAbs name <$> local (mkBoundName name:) (removeNamesM t1)
 
 restoreNamesM :: NamelessTerm -> Env Term
 restoreNamesM t =
   case t of
-    NVar idx -> Var <$> asks (!! idx) -- FIXME: use safe (!!) here
+    NVar idx -> Var <$> asks (\e -> getName $ e !! idx) -- FIXME: use safe (!!) here
     NApp t1 t2 -> App <$> restoreNamesM t1 <*> restoreNamesM t2
     NAbs n t1 -> do
       name <- asks $ nextName n
-      subt <- local (name:) (restoreNamesM t1)
+      subt <- local (mkBoundName name :) (restoreNamesM t1)
       return $ Abs name subt
 
 --
@@ -85,9 +85,9 @@ substituteTop v2 t1 = shift (-1) $ substitute 0 (shift 1 v2) t1
 --
 nextName :: Name -> NamingCtx -> Name
 nextName name ctx
-  | name `elem` ctx =
+  | mkBoundName name `elem` ctx =
     let base = fst $ canonical name
-        f n lst = let (base', no) = canonical n
+        f n lst = let (base', no) = canonical (getName n)
                   in if base == base' then no : lst else lst
         nextNo = succ . maximum . foldr f [] $ ctx
     in base ++ show nextNo

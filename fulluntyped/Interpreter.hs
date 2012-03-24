@@ -78,7 +78,7 @@ run = evalNamedTermSmall . parseExpr
 
 evalWithStrategy :: Term -> Strategy -> String
 evalWithStrategy t strategy =
-  let ctx = Set.toList $ freeVars t
+  let ctx = map mkBoundName $ Set.toList $ freeVars t
       namelessTerm = removeNames ctx t
   in pretty . restoreNames ctx . strategy $ namelessTerm
 
