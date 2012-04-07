@@ -38,7 +38,7 @@ removeNamesM t =
   case t of
     VBool b -> pure $ NVBool b
     Var name -> do
-      idx <- asks $ elemIndex (mkBoundName name)
+      idx <- asks $ findIndex ((== name) . getName)
       maybe (error $ "Unknown var: " ++ name) (return . NVar) idx
     App t1 t2 -> NApp <$> removeNamesM t1 <*> removeNamesM t2
     Abs name ty t1 -> NAbs name ty <$> extendEnv name ty (removeNamesM t1)
