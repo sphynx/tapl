@@ -52,7 +52,7 @@ pretty = render . go maxDepth where
       go' = go (d-1)
 
 ppType :: Ty -> Doc
-ppType TyBool = text "bool"
+ppType TyBool = text "Bool"
 ppType (TyArrow t1@(TyArrow {}) t2) =
   parens (ppType t1) <+> arrow <+> ppType t2
 ppType (TyArrow t1 t2) =
